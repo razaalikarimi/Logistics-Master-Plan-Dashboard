@@ -1,0 +1,41 @@
+# Dependency directories
+node_modules/
+**/node_modules/
+
+# Compiled outputs
+dist/
+**/dist/
+build/
+**/build/
+.next/
+**/ .next/
+
+# Local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
+
+# Diagnostic reports
+.pnp
+.pnp.js
+.gemini/
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Excluded operational templates & assets
+ARCHITECTURE.md
+HEAVY_PROMPT.md
+ss.PNG
