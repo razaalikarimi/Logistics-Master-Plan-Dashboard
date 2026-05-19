@@ -51,6 +51,12 @@ export default function LiveMap({ drivers, orders, forecast, showHeatmap, onMapC
   const ordersGroupRef = useRef<L.LayerGroup | null>(null);
   const heatmapGroupRef = useRef<L.LayerGroup | null>(null);
 
+  // Decouple volatile click handler callback from map initialization effect via mutable ref
+  const onMapClickRef = useRef(onMapClick);
+  useEffect(() => {
+    onMapClickRef.current = onMapClick;
+  }, [onMapClick]);
+
   // Initialize Map
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
@@ -75,8 +81,8 @@ export default function LiveMap({ drivers, orders, forecast, showHeatmap, onMapC
 
     // Handle clicks to place orders
     map.on('click', (e) => {
-      if (onMapClick) {
-        onMapClick({ lat: e.latlng.lat, lng: e.latlng.lng });
+      if (onMapClickRef.current) {
+        onMapClickRef.current({ lat: e.latlng.lat, lng: e.latlng.lng });
       }
     });
 
@@ -88,7 +94,7 @@ export default function LiveMap({ drivers, orders, forecast, showHeatmap, onMapC
         mapRef.current = null;
       }
     };
-  }, [onMapClick]);
+  }, []);
 
   // Update Drivers Markers
   useEffect(() => {
