@@ -1,7 +1,36 @@
 # 🛰️ LOGISTIQ COMMAND CENTER
 > **High-Scale Real-Time Dispatch, Geo-caching & AI Routing Optimization Platform**
 
-Logistiq is an enterprise-grade, high-throughput Logistics Management and Fleet Operations Command Center. The system is designed to simulate and manage high-frequency driver telemetrics ($1\text{ Hz}$ GPS updates), execute automated dispatch matching, solve multi-stop vehicle routes (2-Opt TSP/VRP), and present live spatial demand forecasts.
+Logistiq is an enterprise-grade, high-throughput Logistics Management and Fleet Operations Command Center. The system simulates and manages high-frequency driver telemetrics ($1\text{ Hz}$ GPS updates), executes automated dispatch matching, solves multi-stop vehicle routes (2-Opt TSP/VRP), and visualizes live spatial demand forecasts.
+
+---
+
+## 🗺️ 1. SYSTEM DATA FLOW & ARCHITECTURE
+
+The platform operates on a decoupled, real-time messaging architecture optimized for high-frequency location streaming and low-latency client visualization. 
+
+```mermaid
+graph TD
+    %% Clients
+    DriverApp[Driver Mobile / Simulator] -->|WebSocket: GPS Streams 1Hz| WSServer[Socket.io Gateway Server]
+    AdminDash[Next.js Command Center] -->|HTTP / WebSockets: Map & Control| WSServer
+    
+    %% Ingress and Cache Design
+    WSServer -->|Write-Behind Cache / Live Lookups| RedisCache[(Redis Geocaching Layer)]
+    RedisCache -->|Debounced SQL Flush 15s| PostgreSQL[(PostgreSQL + PostGIS DB)]
+    
+    %% Queue & Routing Engine
+    WSServer -->|REST APIs| RESTHandler[Express API Routes]
+    RESTHandler -->|Calculate TSP Path| RoutingEngine[2-Opt Route Optimizer]
+    RESTHandler -->|Calculate ETA| ETAModel[Predictive Multi-Factor ETA Engine]
+    
+    %% Sandbox Degradation
+    AdminDash -.->|Bypasses Offline Backend| SandboxEngine[Local Browser Sandbox Emulator]
+```
+
+### Architecture Resiliency Profiles:
+1. **Live Production Engine:** Leverages the full TypeScript Express backend powered by WebSockets (`Socket.io`) to stream driver positions, order statuses, and route calculations in real time.
+2. **Local Sandbox Mode:** If the backend server is offline or unreachable, the Next.js frontend gracefully degrades to run a client-side sandbox emulator. It runs simulated matching state machines, road paths, and driver positions directly in the browser using custom curve generators and intervals, keeping the dashboard interactive immediately out-of-the-box.
 
 ---
 
