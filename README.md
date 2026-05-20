@@ -34,20 +34,38 @@ graph TD
 
 ---
 
-## 💎 KEY CAPABILITIES & SYSTEM ARCHITECTURES
+## 🧠 2. KEY CAPABILITIES & ALGORITHMIC GRIDS
 
-### 1. High-Frequency GPS Ingress Pipeline
-*   **Write-Behind Redis Cache:** Driver coordinates are ingested via Socket.io directly to an in-memory Redis cache (using GEOADD/GEORADIUS).
-*   **Debounced Flush:** A background cron runner micro-batches location updates and flushes them to PostgreSQL/PostGIS every 15 seconds to prevent database write locks.
-*   **Smooth Marker Interpolation:** Frontend canvas vehicles utilize a **Kalman Filter** and linear coordinate interpolation to glide smoothly along streets with zero GPS-drift noise.
+### A. High-Frequency GPS Ingress & Client LERP Interpolation
+*   **Write-Behind Redis Cache:** Driver coordinates are ingested via Socket.io directly to an in-memory Redis cache (using `GEOADD` and `GEORADIUS`). A background runner micro-batches location updates and flushes them to PostgreSQL/PostGIS in debounced intervals to prevent database locks.
+*   **Smooth Coordinate LERP:** To prevent vehicle markers from jumping or lagging on the Leaflet map grid, coordinates are smoothed using linear interpolation (LERP) mapped to browser animation frames (`requestAnimationFrame`), enabling fluid vehicle glide along street nodes.
 
-### 2. The 2-Opt TSP Route Optimizer
-*   **Local Search Heuristic:** Leverages a pure TypeScript Vehicle Routing Problem (VRP) solver.
-*   **Crossing Avoidance:** Evaluates candidate edges and swaps coordinate paths (Nearest Neighbor + 2-Opt) to minimize travel durations.
+### B. Automated Nearest-Neighbor Dispatch Engine
+*   **Geospatial Match Pipeline:** When an order transitions to `SEARCHING_DRIVER`, the system queries nearby available drivers, computes their score matrix, and targets the optimal match.
+*   **State Machine Lifecycle:**
+    $$\text{DRAFT} \longrightarrow \text{PLACED} \longrightarrow \text{SEARCHING\_DRIVER} \longrightarrow \text{ACCEPTED} \longrightarrow \text{ARRIVED\_AT\_PICKUP} \longrightarrow \text{PICKED\_UP} \longrightarrow \text{IN\_TRANSIT} \longrightarrow \text{DELIVERED}$$
+*   **Proposal Timeout Retry:** If a proposed driver ignores or declines a match proposal within the 30-second response window, the engine flags the rejection and recalculates the match for the next best available candidate.
 
-### 3. Spatiotemporal Demand Forecasting
-*   **Discrete H3 Hex Grid:** Simulates Uber H3 hexagonal layers to map order density weight forecasting.
-*   **Live Hotspots:** Renders glowing color-coded hexagonal heatmaps to show active peak areas.
+### C. 2-Opt TSP Routing Optimization Heuristic
+To optimize multi-stop itineraries and eliminate crossing paths (reducing travel time and delivery mileage), the routing solver runs a local search heuristic:
+1. **Nearest Neighbor Seed:** Forms a baseline path by appending the geographically closest next stop sequentially.
+2. **2-Opt Swap Evaluation:** Loops through segments and evaluates whether reversing the intermediate nodes reduces the total Haversine path distance.
+3. **Iterative Convergence:** Swaps edges until no further improvement is detected or the maximum iterations are reached.
+
+$$\text{Evaluate Swap: } \Delta D = \left(\text{Dist}(A, C) + \text{Dist}(B, D)\right) - \left(\text{Dist}(A, B) + \text{Dist}(C, D)\right)$$
+
+### D. Predictive Multi-Factor ETA Model
+The system calculates a highly precise estimated time of arrival (ETA) rather than using simple static speeds:
+*   **Circuity Factor:** Converts spherical geodesic (Haversine) distance into actual driving road distance using a routing multiplier coefficient ($1.28$).
+*   **Weather Degradation Coefficients ($C_w$):** Penalizes average velocity (e.g., Rain = $18\%$ speed reduction, Fog = $30\%$, Storm = $50\%$).
+*   **Temporal Congestion Multipliers ($C_t$):** Adjusts speeds dynamically during peak rush hours (8-10 AM, 5-8 PM = $38\%$ reduction), lunch traffic, and overnight clearance.
+*   **Loading Overhead:** Appends a static $180\text{ seconds}$ warehouse staging buffer.
+
+$$\text{ETA (seconds)} = \frac{\text{Geodesic Distance} \times 1.28}{\text{Base Speed (10m/s)} \times C_w \times C_t} + 180$$
+
+### E. Spatiotemporal Demand Forecasting Grid
+*   **H3 Honeycomb Hex Grid:** Operates a honeycomb layout simulating Uber’s spatial H3 grid indexes.
+*   **Dynamic Volume Waves:** Runs high-speed spatial sine-wave cycles to simulate active order density shifts throughout the day, rendering live colored heatmaps to guide drivers towards future hotspots.
 
 ---
 
