@@ -132,25 +132,44 @@ $$\text{ETA (seconds)} = \frac{\text{Geodesic Distance} \times 1.28}{\text{Base 
 
 ---
 
-## 🚀 QUICK START GUIDE
+## 🚀 6. QUICK START GUIDE
 
-### 1. Boot up the Socket & Express Server
-```bash
-cd server
-npm install
-npm run dev
-```
-Runs on: `http://localhost:3001` (WebSocket gateway: `ws://localhost:3001`)
+Follow these instructions to run the logistics system locally.
 
-### 2. Launch the Next.js Operations UI
-```bash
-cd web
-npm install
-npm run dev
-```
-Runs on: `http://localhost:3000`
+### Step 1: Run the Backend Socket Server
+1. Navigate to the server folder:
+   ```bash
+   cd server
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the hot-reloading development server:
+   ```bash
+   npm run dev
+   ```
+   *The server runs at: `http://localhost:3001` (WebSocket: `ws://localhost:3001`)*
 
----
+### Step 2: Run the Next.js Dashboard UI
+1. Open a new terminal and navigate to the web folder:
+   ```bash
+   cd web
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Boot the frontend:
+   ```bash
+   npm run dev
+   ```
+   *The dashboard will be available at: `http://localhost:3000`*
 
-## 🛡️ DUAL-STATE RESILIENCY (SANDBOX MODE)
-If no active backend engine is running, the frontend dashboard gracefully degrades to **Local Sandbox Engine Mode**. The browser will dynamically generate simulated matching engines, route solvers, and GPS movements directly on the client, ensuring the platform is immediately interactive out-of-the-box!
+### Step 3: Test Real-Time Flow
+*   Open `http://localhost:3000` in your browser.
+*   If the backend is connected, the UI shows **LIVE CHANNEL** in the top header. If offline, it fallbacks to **SANDBOX NODE**.
+*   Click **"Set Pickup"** and select a starting point on the Leaflet map.
+*   Click **"Set Delivery"**, then click somewhere else on the map.
+*   Fill out the address inputs and press **"Trigger Dispatcher Match"**.
+*   Watch the matching state-machine select the nearest driver and trace the moving truck path dynamically across the city grid!
