@@ -105,6 +105,33 @@ $$\text{ETA (seconds)} = \frac{\text{Geodesic Distance} \times 1.28}{\text{Base 
 
 ---
 
+## 🔌 5. SYSTEM INTERFACE PROTOCOLS
+
+### REST API Endpoints
+
+| Method | Endpoint | Description | Payload / Response |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/stats` | Retrieve real-time dashboard fleet statistics | `{ totalDrivers, activeDrivers, pendingOrders, ... }` |
+| `GET` | `/api/drivers` | Fetch all driver statuses, pings, and locations | `Array<Driver>` |
+| `GET` | `/api/orders` | Fetch list of active and archived deliveries | `Array<Order>` |
+| `POST` | `/api/orders` | Create/place a new logistics cargo ledger entry | **Body:** `{ pickupAddress, pickupLocation, deliveryAddress, deliveryLocation }` |
+| `POST` | `/api/optimize-route`| Trigger 2-Opt routing solver for coordinates | **Body:** `{ origin: LatLng, stops: LatLng[] }` |
+| `GET` | `/api/demand-forecast`| Fetch demand forecast H3 grid heatmap data | `Array<DemandHex>` |
+| `POST` | `/api/simulate-gps` | Manually kick off a simulated vehicle travel path | **Body:** `{ driverId, destination, orderId }` |
+
+### WebSocket Channels (Socket.io)
+
+*   `join_ops_center` (Client Input): Joins Next.js dashboard client to receive global updates.
+*   `join_order_tracking` (Client Input): Subscribes to updates for a specific order room.
+*   `join_driver` (Driver Input): Sets driver status to `AVAILABLE` and joins specific driver room.
+*   `accept_order` / `decline_order` (Driver Input): Responds to assigned matching proposals.
+*   `location_telemetry` (Driver Input): Receives live raw coordinates from client-side driver apps.
+*   `driver_moved` (Server Broadcast): Emitted on global room containing live positions.
+*   `proposal_broadcasted` (Server Broadcast): Emitted when a driver is pinged for matching.
+*   `order_status_updated` (Server Broadcast): Emitted on order status updates and state changes.
+
+---
+
 ## 🚀 QUICK START GUIDE
 
 ### 1. Boot up the Socket & Express Server
