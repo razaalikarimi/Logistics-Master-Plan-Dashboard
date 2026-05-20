@@ -69,39 +69,38 @@ $$\text{ETA (seconds)} = \frac{\text{Geodesic Distance} \times 1.28}{\text{Base 
 
 ---
 
-## 🛠️ TECH STACK
+## 🛠️ 3. PROJECT TECH STACK
 
-*   **Frontend:** Next.js 16 (App Router, Turbopack, TypeScript, Tailwind CSS, Leaflet Maps)
-*   **Backend:** Node.js (Express, TypeScript, Socket.io)
-*   **Primary DB Spec:** PostgreSQL + PostGIS (Spatial indexing)
-*   **Cache Spec:** Redis (Geospatial indices)
-*   **Workflows:** BullMQ + Redis task workers
+*   **Frontend UI:** Next.js 16 (App Router, Turbopack, TypeScript, Tailwind CSS, Leaflet Maps, Lucide Icons)
+*   **Backend Server:** Node.js (Express, TypeScript, Socket.io)
+*   **Geospatial Standards:** Haversine great-circle calculations, curved Bezier interpolation.
+*   **Target Enterprise DB Schema:** PostgreSQL + PostGIS (Geom spatial indexes) & Redis Geocaching (GEOADD queries)
 
 ---
 
-## 📁 REPOSITORY STRUCTURE
+## 📁 4. REPOSITORY STRUCTURE
 
 ```text
-├── 📁 server/                       # Express Socket.io Server Engine
-│   ├── tsconfig.json                # TypeScript configurations
-│   ├── package.json                 # Backend dependencies
-│   └── 📁 src/
-│       ├── types.ts                 # Domain Type definitions
-│       ├── optimizationEngine.ts    # 2-Opt TSP Route Solver, ETA Regressors
-│       ├── dispatchEngine.ts        # Automated Driver Matcher State Machine
-│       ├── simulator.ts             # Virtual GPS Telemetry Simulator
-│       └── index.ts                 # Server Gateway Entry point
+├── 📁 server/                       # Backend Socket.io & REST Engine
+│   ├── 📁 src/
+│   │   ├── types.ts                 # Domain Type definitions (Orders, Drivers, Logs)
+│   │   ├── optimizationEngine.ts    # 2-Opt TSP Solver, Predictive ETA, Demand forecasting
+│   │   ├── dispatchEngine.ts        # Automated Driver Matcher & state machine validations
+│   │   ├── simulator.ts             # Virtual GPS Telemetry simulator along road paths
+│   │   └── index.ts                 # Express REST & WebSocket server gateway
+│   ├── package.json                 # Backend scripts & dependencies
+│   └── tsconfig.json                # TypeScript compilation config
 │
-└── 📁 web/                          # Next.js App Router Client Dashboard
-    ├── tsconfig.json                # Next.js TS configurations
-    ├── package.json                 # Frontend dependencies
-    └── 📁 src/
-        ├── 📁 components/
-        │   └── LiveMap.tsx          # Leaflet Dark-Themed Canvas Maps
-        └── 📁 app/
-            ├── globals.css          # Glassmorphic layout classes & glows
-            ├── layout.tsx           # SEO Metadata Shell
-            └── page.tsx             # Dispatch Dashboard Console
+└── 📁 web/                          # Next.js Command Center App
+    ├── 📁 src/
+    │   ├── 📁 components/
+    │   │   └── LiveMap.tsx          # Leaflet map canvas, custom SVG markers & path overlays
+    │   └── 📁 app/
+    │       ├── globals.css          # Glassmorphic panel stylings and glows
+    │       ├── layout.tsx           # SEO Metadata wrapper
+    │       └── page.tsx             # Interactive dashboard console (Three-column layout)
+    ├── package.json                 # Next.js scripts & Tailwind config
+    └── tsconfig.json                # Frontend TypeScript configurations
 ```
 
 ---
